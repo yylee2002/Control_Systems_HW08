@@ -1,0 +1,30 @@
+close all; clear; clc;
+
+%% Parameters
+a_list = [0.01, 0.1, 1, 10, 100];
+num_a = length(a_list);
+Mp = zeros(1, num_a);
+Mr = zeros(1, num_a);
+
+s = tf('s');
+sysG = {};
+for i = 1:num_a
+    sysG{i} = (s / a_list(i) + 1) / (s^2 + s + 1);
+end
+
+fig = figure(Name = "Step Response");
+hold on;
+for i = 1:num_a
+    step(sysG{i});
+end
+hold off;
+lines = findobj(gcf, 'Type', 'line');
+set(lines, 'LineWidth', 2);  % Set all lines to a thicker width of 2
+grid on;
+title("");
+ylabel("The step response")
+% axis([-inf, 2, -inf, inf]);
+legend_labels = arrayfun(@(x) sprintf('$p\\_3=%f$', x), a_list, 'UniformOutput', false);
+lgd = legend(legend_labels, 'Interpreter', 'latex');
+set(fig, "position", [200, 50, 1000, 550]);
+%saveas(fig, "HW07/Fig/Step_Response.png");
