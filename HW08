@@ -7,15 +7,17 @@ Mp = zeros(1, num_a);
 Mr = zeros(1, num_a);
 
 s = tf('s');
-sysG = {};
+sysG = cell(1, num_a);
 for i = 1:num_a
     sysG{i} = (s / a_list(i) + 1) / (s^2 + s + 1);
 end
 
+%% Step Response
 fig = figure(Name = "Step Response");
 hold on;
 for i = 1:num_a
     step(sysG{i});
+    Mp(i) = stepinfo(sysG{i}).Overshoot;
 end
 hold off;
 lines = findobj(gcf, 'Type', 'line');
@@ -24,7 +26,36 @@ grid on;
 title("");
 ylabel("The step response")
 % axis([-inf, 2, -inf, inf]);
-legend_labels = arrayfun(@(x) sprintf('$p\\_3=%f$', x), a_list, 'UniformOutput', false);
-lgd = legend(legend_labels, 'Interpreter', 'latex');
+legend_labels = arrayfun(@(x) sprintf('$\\alpha=%.3g$', x), a_list, 'UniformOutput', false);
+legend(legend_labels, 'Interpreter', 'latex');
 set(fig, "position", [200, 50, 1000, 550]);
-%saveas(fig, "HW07/Fig/Step_Response.png");
+saveas(fig, "HW08/Fig/Step_Response");
+saveas(fig, "HW08/Fig/Step_Response.png");
+
+%% Bode Plot
+figb = figure(Name = "Bode Plot");
+hold on;
+for i = 1:num_a
+    bode(sysG{i});
+    Mr(i) = max(bode(sysG{i}));
+end
+hold off;
+lines = findobj(gcf, 'Type', 'line');
+set(lines, 'LineWidth', 2);  % Set all lines to a thicker width of 2
+grid on;
+title("");
+ylabel("The Bode plot")
+% axis([-inf, 2, -inf, inf]);
+legend(legend_labels, 'Interpreter', 'latex');
+set(figb, "position", [300, 50, 1000, 550]);
+saveas(figb, "HW08/Fig/Bode_Plot");
+saveas(figb, "HW08/Fig/Bode_Plot.png");
+
+%% Mp and Mr
+fprintf("Mp = [ ");
+fprintf('%.2f ', Mp);
+fprintf("] (%%)\n\n");
+
+fprintf("Mr = [ ");
+fprintf('%.2f ', Mr);
+fprintf("] \n\n");
